@@ -1,0 +1,56 @@
+@(title: String)
+
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>@title</title>
+        <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
+        <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
+        <script src="@routes.Assets.at("javascripts/jquery-1.9.0.min.js")" type="text/javascript"></script>
+
+        <script type="text/javascript">
+            $(function() {
+                var feed = new EventSource('/liveUpdates');
+
+                // receive message
+                feed.addEventListener('message', function(e) {
+                    var data = JSON.parse(e.data);
+                    console.log(data);
+                }, false);
+
+                $("#getItems").on("click", function() {
+                    var time = new Date().getTime();
+                    $.ajax("/items", {
+                        success: function(data) {
+                            console.log(new Date().getTime() - time);
+                            $("#items").text(JSON.stringify(data));
+                        }
+                    });
+                });
+                $("#addItem").on("click", function() {
+                    $.ajax("/items", {
+                        method: "put"
+                    });
+                });
+                $("#addLiveUpdate").on("click", function() {
+                    $.ajax("/liveUpdates", {
+                        method: "put"
+                    });
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <div id="items">
+
+        </div>
+        <button id="addItem">Add Item</button>
+        <button id="getItems">Get Items</button>
+
+        <div id="liveUpdates">
+
+        </div>
+        <button id="addLiveUpdate">Add LiveUpdate</button>
+    </body>
+</html>
